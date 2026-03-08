@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pokédex</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #1e293b;
+      --card-2: #334155;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --accent: #ef4444;
+      --accent-2: #22c55e;
+      --border: #475569;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(180deg, #0f172a 0%, #111827 100%);
+      color: var(--text);
+    }
+
+    header {
+      padding: 24px 16px;
+      text-align: center;
+      border-bottom: 1px solid var(--border);
+      background: rgba(15, 23, 42, 0.9);
+      position: sticky;
+      top: 0;
+      backdrop-filter: blur(10px);
+      z-index: 10;
+    }
+
+    h1 {
+      margin: 0 0 16px;
+      font-size: 2rem;
+    }
+
+    .search-bar {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .search-bar input,
+    .search-bar button {
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      font-size: 1rem;
+    }
+
+    .search-bar input {
+      width: min(420px, 90vw);
+      background: var(--card);
+      color: var(--text);
+    }
+
+    .search-bar button {
+      background: var(--accent);
+      color: white;
+      cursor: pointer;
+      border: none;
+      font-weight: bold;
+    }
+
+    .search-bar button:hover {
+      opacity: 0.9;
+    }
+
+    main {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 24px 16px 40px;
+    }
+
+    .status {
+      text-align: center;
+      color: var(--muted);
+      margin-bottom: 20px;
+    }
+
+    .pokemon-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+    }
+
+    .pokemon-card {
+      background: linear-gradient(180deg, var(--card) 0%, var(--card-2) 100%);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+      transition: transform 0.2s ease;
+    }
+
+    .pokemon-card:hover {
+      transform: translateY(-4px);
+    }
+
+    .pokemon-card img {
+      width: 140px;
+      height: 140px;
+      object-fit: contain;
+      display: block;
+      margin: 0 auto 12px;
+    }
+
+    .pokemon-id {
+      color: var(--muted);
+      font-size: 0.95rem;
+      margin-bottom: 4px;
+    }
+
+    .pokemon-name {
+      font-size: 1.35rem;
+      font-weight: bold;
+      margin-bottom: 12px;
+      text-transform: capitalize;
+    }
+
+    .types {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    .type {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-size: 0.9rem;
+      text-transform: capitalize;
+    }
+
+    .stats {
+      display: grid;
+      gap: 8px;
+    }
+
+    .stat-row {
+      display: grid;
+      grid-template-columns: 80px 1fr 40px;
+      gap: 8px;
+      align-items: center;
+      font-size: 0.9rem;
+    }
+
+    .bar {
+      height: 10px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .bar > span {
+      display: block;
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      border-radius: 999px;
+    }
+
+    .load-more {
+      display: block;
+      margin: 28px auto 0;
+      padding: 12px 18px;
+      border: none;
+      border-radius: 12px;
+      background: #2563eb;
+      color: white;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Pokédex</h1>
+    <div class="search-bar">
+      <input id="searchInput" type="text" placeholder="Chercher un Pokémon dans mon pokedex" />
+      <button id="searchBtn">Rechercher</button>
+      <button id="resetBtn">Réinitialiser</button>
+    </div>
+  </header>
+
+  <main>
+    <p id="status" class="status">Chargement des Pokémon...</p>
+    <section id="pokemonGrid" class="pokemon-grid"></section>
+    <button id="loadMoreBtn" class="load-more">Charger plus</button>
+  </main>
+
+  <script>
+    const API_BASE = 'https://pokeapi.co/api/v2';
+    const pokemonGrid = document.getElementById('pokemonGrid');
+    const statusEl = document.getElementById('status');
+    const loadMoreBtn = document.getElementById('loadMoreBtn');
+    const searchInput = document.getElementById('searchInput');
+    const searchBtn = document.getElementById('searchBtn');
+    const resetBtn = document.getElementById('resetBtn');
+
+    let offset = 0;
+    const limit = 12;
+
+    function formatName(name) {
+      return name.replace(/-/g, ' ');
+    }
+
+    function createPokemonCard(pokemon) {
+      const statsHtml = pokemon.stats.map(stat => {
+        const value = stat.base_stat;
+        const width = Math.min((value / 180) * 100, 100);
+        return `
+          <div class="stat-row">
+            <span>${formatName(stat.stat.name)}</span>
+            <div class="bar"><span style="width:${width}%"></span></div>
+            <strong>${value}</strong>
+          </div>
+        `;
+      }).join('');
+
+      const typesHtml = pokemon.types.map(type => `
+        <span class="type">${type.type.name}</span>
+      `).join('');
+
+      const card = document.createElement('article');
+      card.className = 'pokemon-card';
+      card.innerHTML = `
+        <img src="${pokemon.sprites.other['official-artwork'].front_default || pokemon.sprites.front_default}" alt="${pokemon.name}" />
+        <div class="pokemon-id">#${String(pokemon.id).padStart(4, '0')}</div>
+        <div class="pokemon-name">${formatName(pokemon.name)}</div>
+        <div class="types">${typesHtml}</div>
+        <div class="stats">${statsHtml}</div>
+      `;
+
+      pokemonGrid.appendChild(card);
+    }
+
+    async function fetchPokemonDetails(url) {
+      const response = await fetch(url);
+      if (!response.ok) throw new Error('Erreur lors du chargement du Pokémon');
+      return response.json();
+    }
+
+    async function loadPokemonBatch() {
+      try {
+        statusEl.textContent = 'Chargement...';
+        loadMoreBtn.disabled = true;
+
+        const response = await fetch(`${API_BASE}/pokemon?limit=${limit}&offset=${offset}`);
+        if (!response.ok) throw new Error('Impossible de récupérer la liste des Pokémon');
+
+        const data = await response.json();
+        const details = await Promise.all(data.results.map(pokemon => fetchPokemonDetails(pokemon.url)));
+
+        details.forEach(createPokemonCard);
+        offset += limit;
+        statusEl.textContent = `${pokemonGrid.children.length} Pokémon affichés`;
+      } catch (error) {
+        statusEl.textContent = error.message;
+      } finally {
+        loadMoreBtn.disabled = false;
+      }
+    }
+
+    async function searchPokemon() {
+      const query = searchInput.value.trim().toLowerCase();
+      if (!query) {
+        statusEl.textContent = 'Entre un nom ou un numéro de Pokémon.';
+        return;
+      }
+
+      try {
+        pokemonGrid.innerHTML = '';
+        statusEl.textContent = 'Recherche en cours...';
+        loadMoreBtn.classList.add('hidden');
+
+        const response = await fetch(`${API_BASE}/pokemon/${query}`);
+        if (!response.ok) throw new Error('Pokémon introuvable');
+
+        const pokemon = await response.json();
+        createPokemonCard(pokemon);
+        statusEl.textContent = `Résultat pour : ${formatName(pokemon.name)}`;
+      } catch (error) {
+        statusEl.textContent = error.message;
+      }
+    }
+
+    function resetPokedex() {
+      pokemonGrid.innerHTML = '';
+      offset = 0;
+      searchInput.value = '';
+      loadMoreBtn.classList.remove('hidden');
+      loadPokemonBatch();
+    }
+
+    loadMoreBtn.addEventListener('click', loadPokemonBatch);
+    searchBtn.addEventListener('click', searchPokemon);
+    resetBtn.addEventListener('click', resetPokedex);
+    searchInput.addEventListener('keydown', event => {
+      if (event.key === 'Enter') searchPokemon();
+    });
+
+    loadPokemonBatch();
+  </script>
+</body>
+</html>
