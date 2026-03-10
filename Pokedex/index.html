@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pokédex</title>
+  <link rel="stylesheet" href="./css/styles.css" />
+  <link rel="icon" href="data:," />
+</head>
+<body>
+  <header>
+    <h1>Pokédex</h1>
+    <div class="search-bar">
+      <input id="searchInput" type="text" placeholder="Chercher un Pokémon dans mon pokedex" />
+      <button id="searchBtn">Rechercher</button>
+      <button id="resetBtn">Réinitialiser</button>
+    </div>
+  </header>
+  <main>
+    <section class="panel">
+      <div class="panel-header">
+        <h2>Historique des recherches</h2>
+        <button id="clearHistoryBtn" class="secondary-btn">Vider</button>
+      </div>
+      <div id="historyList" class="tag-list"></div>
+    </section>
+    <section class="panel">
+      <div class="panel-header">
+        <h2>Favoris</h2>
+      </div>
+      <div id="favoritesList" class="tag-list"></div>
+    </section>
+    <p id="status" class="status">Chargement des Pokémon...</p>
+    <section id="pokemonGrid" class="pokemon-grid"></section>
+    <button id="loadMoreBtn" class="load-more">Charger plus</button>
+  </main>
+  <script type="module" src="./js/main.js"></script>
+</body>
+</html>

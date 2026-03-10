@@ -1,0 +1,221 @@
+:root {
+  --bg: #0f172a;
+  --card: #1e293b;
+  --card-2: #334155;
+  --text: #e2e8f0;
+  --muted: #94a3b8;
+  --accent: #ef4444;
+  --accent-2: #22c55e;
+  --border: #475569;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: linear-gradient(180deg, #0f172a 0%, #111827 100%);
+  color: var(--text);
+}
+header {
+  padding: 24px 16px;
+  text-align: center;
+  border-bottom: 1px solid var(--border);
+  background: rgba(15, 23, 42, 0.9);
+  position: sticky;
+  top: 0;
+  backdrop-filter: blur(10px);
+  z-index: 10;
+}
+h1 {
+  margin: 0 0 16px;
+  font-size: 2rem;
+}
+.search-bar {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.search-bar input,
+.search-bar button {
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  font-size: 1rem;
+}
+.search-bar input {
+  width: min(420px, 90vw);
+  background: var(--card);
+  color: var(--text);
+}
+.search-bar button {
+  background: var(--accent);
+  color: white;
+  cursor: pointer;
+  border: none;
+  font-weight: bold;
+}
+.search-bar button:hover {
+  opacity: 0.9;
+}
+main {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 24px 16px 40px;
+}
+.status {
+  text-align: center;
+  color: var(--muted);
+  margin-bottom: 20px;
+}
+.pokemon-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+}
+.pokemon-card {
+  background: linear-gradient(180deg, var(--card) 0%, var(--card-2) 100%);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+  transition: transform 0.2s ease;
+  position: relative;
+}
+.pokemon-card:hover {
+  transform: translateY(-4px);
+}
+.pokemon-card img {
+  width: 140px;
+  height: 140px;
+  object-fit: contain;
+  display: block;
+  margin: 0 auto 12px;
+}
+.pokemon-id {
+  color: var(--muted);
+  font-size: 0.95rem;
+  margin-bottom: 4px;
+}
+.pokemon-name {
+  font-size: 1.35rem;
+  font-weight: bold;
+  margin-bottom: 12px;
+  text-transform: capitalize;
+}
+.types {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.type {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-size: 0.9rem;
+  text-transform: capitalize;
+}
+.stats {
+  display: grid;
+  gap: 8px;
+}
+.stat-row {
+  display: grid;
+  grid-template-columns: 80px 1fr 40px;
+  gap: 8px;
+  align-items: center;
+  font-size: 0.9rem;
+}
+.bar {
+  height: 10px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.bar > span {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  border-radius: 999px;
+}
+.load-more {
+  display: block;
+  margin: 28px auto 0;
+  padding: 12px 18px;
+  border: none;
+  border-radius: 12px;
+  background: #2563eb;
+  color: white;
+  font-size: 1rem;
+  cursor: pointer;
+}
+.hidden { display: none; }
+.panel {
+  background: linear-gradient(180deg, var(--card) 0%, var(--card-2) 100%);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 16px;
+  margin-bottom: 18px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+.panel-header h2 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+.tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.tag-button,
+.secondary-btn,
+.favorite-btn {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 0.95rem;
+}
+.tag-button {
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text);
+}
+.secondary-btn {
+  padding: 8px 12px;
+  background: #475569;
+  color: white;
+  border: none;
+}
+.favorite-btn {
+  width: 100%;
+  margin-top: 14px;
+  padding: 10px 12px;
+  background: #f59e0b;
+  color: white;
+  border: none;
+  font-weight: bold;
+}
+.favorite-btn.is-favorite {
+  background: #d97706;
+}
+.empty-text {
+  color: var(--muted);
+  margin: 0;
+}
+.favorite-card-button {
+  padding: 8px 12px;
+  background: rgba(245, 158, 11, 0.15);
+  color: var(--text);
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  border-radius: 12px;
+  cursor: pointer;
+}
